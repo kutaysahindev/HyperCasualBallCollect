@@ -356,6 +356,7 @@
 "Assets/Scripts/GameManager.cs"
 "Assets/Scripts/GateController.cs"
 "Assets/Scripts/LevelComplete.cs"
+"Assets/Scripts/MainMenu.cs"
 -langversion:9.0
 
 /deterministic

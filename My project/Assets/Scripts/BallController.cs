@@ -12,6 +12,7 @@ public class BallController : MonoBehaviour
     [SerializeField] private float _horizontalLimit;
     private float _horizontal;
     private int _gateNumber;
+    public float _restartDelay = 2f;
 
     [SerializeField] private GameObject _ballPrefab;
 
@@ -31,7 +32,7 @@ public class BallController : MonoBehaviour
         ForwardBallMove();
         UpdateBallCountText();
     }
-
+    public bool IsGameStarted { get; set; }
     private void HorizontalBallMove()
     {
         float _newX;
@@ -59,9 +60,14 @@ public class BallController : MonoBehaviour
     {
         transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
     }
-
+    private int tmpBallCount;
     private void UpdateBallCountText()
     {
+        if (tmpBallCount == _balls.Count)
+        {
+            return;
+        }
+        tmpBallCount = _balls.Count;
         _ballCountText.text = _balls.Count.ToString();
     }
 
@@ -70,7 +76,9 @@ public class BallController : MonoBehaviour
         if (other.gameObject.CompareTag("BallStack"))
         {
             other.gameObject.transform.SetParent(transform);
-            other.gameObject.GetComponent<SphereCollider>().enabled = false;
+            //other.gameObject.GetComponent<SphereCollider>().enabled = false;
+            other.gameObject.TryGetComponent<SphereCollider>(out var sphereCollider);
+            if (sphereCollider) sphereCollider.enabled = false;
             other.gameObject.transform.localPosition = new Vector3(0f, 0f, _balls[_balls.Count - 1].transform.localPosition.z - 1f);
             _balls.Add(other.gameObject);
         }
@@ -90,7 +98,7 @@ public class BallController : MonoBehaviour
                 {
                     if (this.gameObject != null)
                     {
-                        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                        Invoke("Restart", _restartDelay);
                     }
                 }
                 if (_targetCount > 0)
@@ -120,5 +128,10 @@ public class BallController : MonoBehaviour
             _balls[i].SetActive(false);
             _balls.RemoveAt(i);
         }
+    }
+
+    private void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
